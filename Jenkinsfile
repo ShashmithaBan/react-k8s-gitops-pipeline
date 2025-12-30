@@ -10,14 +10,15 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            agent any
-             steps {
-                git branch: 'main',
-                    credentialsId: 'github-creds',
-                    url: 'https://github.com/ShashmithaBan/Portfolio_2026.git'
-                 }
+        stage('Checkout React App') {
+        agent any
+        steps {
+            // This MUST point to your React code repo, not the pipeline repo
+            git branch: 'main',
+                credentialsId: 'github-creds',
+                url: 'https://github.com/ShashmithaBan/Portfolio_2026.git'
         }
+    }
 
         stage('Install & Build React') {
             agent {
