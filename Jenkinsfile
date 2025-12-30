@@ -50,6 +50,7 @@ pipeline {
                         -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                         -Dsonar.organization=${SONAR_ORG} \
                         -Dsonar.sources=src
+                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                     """
                 }
             }
