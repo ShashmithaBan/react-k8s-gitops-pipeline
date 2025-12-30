@@ -10,15 +10,15 @@ pipeline {
 
     stages {
 
-        stage('Checkout React App') {
-        agent any
-        steps {
-            // This MUST point to your React code repo, not the pipeline repo
-            git branch: 'main',
-                credentialsId: 'github-creds',
-                url: 'https://github.com/ShashmithaBan/Portfolio_2026.git'
+            stage('Checkout') {
+            agent any
+            steps {
+                cleanWs() // Deletes the old Jenkinsfile and package-lock.json leftovers
+                git branch: 'main',
+                    credentialsId: 'github-creds',
+                    url: 'https://github.com/ShashmithaBan/Portfolio_2026.git'
+            }
         }
-    }
 
         stage('Install & Build React') {
             agent {
