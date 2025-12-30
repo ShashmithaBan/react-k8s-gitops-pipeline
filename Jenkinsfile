@@ -7,7 +7,10 @@ pipeline {
         SONAR_ORG = "shashmithaban"
         SONAR_SERVER_ID   = "sonarcloud"
     }
-
+    options {
+            // This prevents Jenkins from overwriting your React code with the Jenkinsfile repo
+            skipDefaultCheckout() 
+    }
     stages {
 
             stage('Checkout') {
