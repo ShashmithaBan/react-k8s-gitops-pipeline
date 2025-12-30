@@ -75,7 +75,7 @@ pipeline {
                 myImage.push()
                 
               
-              
+
                 myImage.push("latest")
             }
         }
@@ -90,4 +90,5 @@ pipeline {
             echo '❌ Pipeline failed'
         }
     }
+}
 }
