@@ -81,7 +81,7 @@ pipeline {
         }
     }
 }
-
+    }
     post {
         success {
             echo '✅ Build executed inside Docker containers'
@@ -90,5 +90,5 @@ pipeline {
             echo '❌ Pipeline failed'
         }
     }
-}
+
 }
