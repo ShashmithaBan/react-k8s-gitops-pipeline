@@ -62,22 +62,20 @@ pipeline {
 
         stage('Docker Build & Push') {
     environment {
-        // We use the variables defined at the top of the pipeline
+      
         DOCKER_IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
     }
     steps {
         script {
-            // 1. Build the image using standard shell
-            // Note: If your Dockerfile is in the root, you don't need 'cd'
+          
             sh "docker build -t ${DOCKER_IMAGE_TAG} ."
 
-            // 2. Use the Docker Pipeline Plugin to push
-            // 'docker-cred' must be the ID of your 'Username with password' credential
-            docker.withRegistry('https://index.docker.io/v1/', "dockerhub-creds") {
+                      docker.withRegistry('https://index.docker.io/v1/', "dockerhub-creds") {
                 def myImage = docker.image("${DOCKER_IMAGE_TAG}")
                 myImage.push()
                 
-                // Optional: Also push the 'latest' tag
+              
+              
                 myImage.push("latest")
             }
         }
