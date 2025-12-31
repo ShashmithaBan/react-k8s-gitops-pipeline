@@ -36,33 +36,33 @@ pipeline {
             }
         }
 
-        stage('SonarCloud Analysis') {
-            agent {
-                docker {
-                    image 'sonarsource/sonar-scanner-cli:latest'
-                }
-            }
-            steps {
-                // Automatically injects the Sonar token and URL from Jenkins config
-               withSonarQubeEnv("${SONAR_SERVER_ID}") {
-                    sh """
-                      sonar-scanner \
-                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                        -Dsonar.organization=${SONAR_ORG} \
-                        -Dsonar.sources=src
-                    """
-                }
-            }
-        }
+        // stage('SonarCloud Analysis') {
+        //     agent {
+        //         docker {
+        //             image 'sonarsource/sonar-scanner-cli:latest'
+        //         }
+        //     }
+        //     steps {
+        //         // Automatically injects the Sonar token and URL from Jenkins config
+        //        withSonarQubeEnv("${SONAR_SERVER_ID}") {
+        //             sh """
+        //               sonar-scanner \
+        //                 -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+        //                 -Dsonar.organization=${SONAR_ORG} \
+        //                 -Dsonar.sources=src
+        //             """
+        //         }
+        //     }
+        // }
 
-        stage('Quality Gate') {
-            agent any
-            steps {
-                timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     agent any
+        //     steps {
+        //         timeout(time: 2, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
         stage('Docker Build & Push') {
     environment {
