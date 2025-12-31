@@ -26,7 +26,7 @@ pipeline {
         stage('Install & Build React') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'node:20-alpine'
                     args '-u root'
                 }
             }
@@ -50,7 +50,6 @@ pipeline {
                         -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                         -Dsonar.organization=${SONAR_ORG} \
                         -Dsonar.sources=src
-                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                     """
                 }
             }
