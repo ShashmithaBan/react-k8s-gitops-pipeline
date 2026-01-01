@@ -68,6 +68,7 @@ pipeline {
         // }
 
         stage('Docker Build & Push') {
+            agent any
     environment {
       
         DOCKER_IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
