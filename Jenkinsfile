@@ -36,6 +36,7 @@ pipeline {
         
         // LIMIT the memory to 512MB or 1GB to prevent the instance from crashing
         sh 'NODE_OPTIONS="--max-old-space-size=512" npm run build'
+        stash name: 'build-output', includes: 'dist/**, Dockerfile'
             }
         }
 
@@ -75,7 +76,7 @@ pipeline {
     }
     steps {
         script {
-          
+            unstash 'build-output'
             sh "docker build -t ${DOCKER_IMAGE_TAG} ."
 
                       docker.withRegistry('https://index.docker.io/v1/', "dockerhub-creds") {
