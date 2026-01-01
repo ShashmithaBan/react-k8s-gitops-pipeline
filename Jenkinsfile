@@ -31,8 +31,11 @@ pipeline {
                 }
             }
             steps {
-                sh 'npm install'
-                sh 'npm run build'
+               // --no-audit and --prefer-offline make it much faster
+        sh 'npm ci --prefer-offline'
+        
+        // LIMIT the memory to 512MB or 1GB to prevent the instance from crashing
+        sh 'NODE_OPTIONS="--max-old-space-size=512" npm run build'
             }
         }
 
