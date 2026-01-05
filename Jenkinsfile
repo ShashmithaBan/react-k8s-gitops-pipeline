@@ -68,23 +68,25 @@ pipeline {
         //     }
         // }
 
-        stage('Docker Build & Push') {
-            agent any
-    environment {
-      
-        DOCKER_IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
-    }
+stage('Docker Build & Push') {
+    // This is the missing piece that provides the 'FilePath' context
+    agent any 
+
     steps {
         script {
+            // Unstash the build files from the previous stage
             unstash 'build-output'
-            sh "docker build -t ${DOCKER_IMAGE_TAG} ."
+            
+            // Define your image tag
+            def imageTag = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
+            
+            // Build the image
+            sh "docker build -t ${imageTag} ."
 
-                      docker.withRegistry('https://index.docker.io/v1/', "dockerhub-creds") {
-                def myImage = docker.image("${DOCKER_IMAGE_TAG}")
+            // Login and Push to Docker Hub
+            docker.withRegistry('https://index.docker.io/v1/', "dockerhub-creds") {
+                def myImage = docker.image(imageTag)
                 myImage.push()
-                
-              
-
                 myImage.push("latest")
             }
         }
