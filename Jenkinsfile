@@ -91,16 +91,12 @@ pipeline {
     }
 }
     }
-     post {
-        always {
-            script {
-                // Remove local images to save disk space
-                sh "docker rmi ${DOCKER_IMAGE}:${BUILD_NUMBER} || true"
-                sh "docker rmi ${DOCKER_IMAGE}:latest || true"
-                
-                // Fully wipe the workspace to prevent stash conflicts
-                cleanWs()
-            }
+    post {
+        success {
+            echo '✅ Build executed inside Docker containers'
+        }
+        failure {
+            echo '❌ Pipeline failed'
         }
     }
 
