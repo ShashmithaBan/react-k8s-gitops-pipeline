@@ -24,21 +24,27 @@ pipeline {
         }
 
         stage('Install & Build React') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    args '-u root'
-                }
-            }
-            steps {
-               // --no-audit and --prefer-offline make it much faster
+    agent {
+        docker {
+            // 'slim' is more stable for Jenkins than 'alpine' 
+            image 'node:20-slim'
+            args '-u root'
+        }
+    }
+    steps {
+        // 'npm ci' is faster and more reliable for CI/CD
         sh 'npm ci --prefer-offline'
         
-        // LIMIT the memory to 512MB or 1GB to prevent the instance from crashing
+        // This limit is essential for your T2.micro instance
         sh 'NODE_OPTIONS="--max-old-space-size=512" npm run build'
+        
+        // Verify the files exist before stashing to catch errors early
+        sh 'ls -l dist/ && ls -l Dockerfile'
+        
+        // Stash the build artifacts AND the Dockerfile for the host agent
         stash name: 'build-output', includes: 'dist/**, Dockerfile'
-            }
-        }
+    }
+}
 
         // stage('SonarCloud Analysis') {
         //     agent {
