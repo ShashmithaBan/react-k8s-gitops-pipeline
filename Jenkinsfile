@@ -93,12 +93,15 @@ stage('Docker Build & Push') {
                 branches: [[name: 'main']], 
                 userRemoteConfigs: [[url: 'https://github.com/ShashmithaBan/Portfolio_2026.git', credentialsId: 'github-creds']]
             ])
+// 1. Show ALL files and folders recursively
+    sh 'ls -R' 
 
+    // 2. Search for the file regardless of case
+    sh 'find . -iname "dockerfile"'
             // 3. Bring in the 'dist' folder from the previous build stage
             unstash 'build-output'
 
-            // 4. Verify the Dockerfile is actually here now
-            sh 'ls -l Dockerfile'
+            
 
             def imageTag = "shashmitha2001/portfolio-deploy-react:${BUILD_NUMBER}"
             
