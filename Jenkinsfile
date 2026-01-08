@@ -81,31 +81,33 @@ pipeline {
         // }
 
 stage('Docker Build & Push') {
-    // This is the missing piece that provides the 'FilePath' context
     agent any 
-
     steps {
         script {
-            cleanWs()
-            checkout scm
-            // Unstash the build files from the previous stage
-            try {
-                unstash 'build-output'
-            } catch (Exception e) {
-                error "Failed to unstash. Workspace might be corrupted: ${e.message}"
-            }
+            // 1. Clear the workspace to avoid permission issues
+            cleanWs() 
+
+            // 2. Pull the code repo directly to THIS agent
+            // This ensures the Dockerfile is physically present in the root
+            checkout([$class: 'GitSCM', 
+                branches: [[name: 'main']], 
+                userRemoteConfigs: [[url: 'https://github.com/ShashmithaBan/Portfolio_2026.git', credentialsId: 'github-creds']]
+            ])
+
+            // 3. Bring in the 'dist' folder from the previous build stage
+            unstash 'build-output'
+
+            // 4. Verify the Dockerfile is actually here now
+            sh 'ls -l Dockerfile'
+
+            def imageTag = "shashmitha2001/portfolio-deploy-react:${BUILD_NUMBER}"
             
-            // Define your image tag
-            def imageTag = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
-            
-            // Build the image
+            // 5. Build and Push
             sh "docker build -t ${imageTag} ."
 
-            // Login and Push to Docker Hub
             docker.withRegistry('https://index.docker.io/v1/', "dockerhub-creds") {
-                def myImage = docker.image(imageTag)
-                myImage.push()
-                myImage.push("latest")
+                docker.image(imageTag).push()
+                docker.image(imageTag).push("latest")
             }
         }
     }
