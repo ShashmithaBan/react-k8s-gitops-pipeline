@@ -95,6 +95,7 @@ stage('Docker Build & Push') {
     }
    post {
         always {
+          node('built-in') {
             script {
                 // Remove local images to save disk space
                 sh "docker rmi ${DOCKER_IMAGE}:${BUILD_NUMBER} || true"
@@ -103,6 +104,7 @@ stage('Docker Build & Push') {
                 // Fully wipe the workspace to prevent stash conflicts
                 cleanWs()
             }
+          }
         }
     }
 
