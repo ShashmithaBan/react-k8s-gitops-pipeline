@@ -74,8 +74,14 @@ stage('Docker Build & Push') {
 
     steps {
         script {
+            cleanWs()
+            checkout scm
             // Unstash the build files from the previous stage
-            unstash 'build-output'
+            try {
+                unstash 'build-output'
+            } catch (Exception e) {
+                error "Failed to unstash. Workspace might be corrupted: ${e.message}"
+            }
             
             // Define your image tag
             def imageTag = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
