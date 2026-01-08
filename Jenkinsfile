@@ -31,23 +31,27 @@ pipeline {
         }
     }
     steps {
+        // Force checkout to the CURRENT directory
+        checkout([$class: 'GitSCM', 
+            branches: [[name: 'main']], 
+            userRemoteConfigs: [[url: 'https://github.com/ShashmithaBan/Portfolio_2026.git', credentialsId: 'github-creds']]
+        ])
 
-        git branch: 'main', 
-            credentialsId: 'github-creds', 
-            url: 'https://github.com/ShashmithaBan/Portfolio_2026.git'
-
-        
         sh 'npm ci --prefer-offline'
         sh 'NODE_OPTIONS="--max-old-space-size=512" npm run build'
         
+        script {
+            // This will show us EVERY file in the workspace to debug
+            sh 'ls -R' 
+            
+            // If it still can't find it, we search for it
+            sh 'find . -name "Dockerfile"'
+        }
         
-        sh 'ls -l dist/ && ls -l Dockerfile' 
-        
-     
-        stash name: 'build-output', includes: 'dist/**, Dockerfile'
+        // Use a wildcard to find the Dockerfile wherever it is in the root
+        stash name: 'build-output', includes: 'dist/**, **/Dockerfile'
     }
 }
-
         // stage('SonarCloud Analysis') {
         //     agent {
         //         docker {
