@@ -26,22 +26,22 @@ pipeline {
         stage('Install & Build React') {
     agent {
         docker {
-            // 'slim' is more stable for Jenkins than 'alpine' 
             image 'node:20-slim'
             args '-u root'
         }
     }
     steps {
-        // 'npm ci' is faster and more reliable for CI/CD
+       
+        git branch: 'main', 
+            credentialsId: 'github-creds', 
+            url: 'https://github.com/ShashmithaBan/Portfolio_2026.git'
+
         sh 'npm ci --prefer-offline'
-        
-        // This limit is essential for your T2.micro instance
         sh 'NODE_OPTIONS="--max-old-space-size=512" npm run build'
         
-        // Verify the files exist before stashing to catch errors early
-        sh 'ls -l dist/ && ls -l Dockerfile'
+       
+        sh 'ls -l Dockerfile' 
         
-        // Stash the build artifacts AND the Dockerfile for the host agent
         stash name: 'build-output', includes: 'dist/**, Dockerfile'
     }
 }
