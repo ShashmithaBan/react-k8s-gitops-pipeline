@@ -105,8 +105,8 @@ stage('Docker Build & Push') {
 
             def imageTag = "shashmitha2001/portfolio-deploy-react:${BUILD_NUMBER}"
             
-            // 5. Build and Push
-            sh "docker build -t ${imageTag} ."
+            // 5. Build and Push (using -f to specify DockerFile with capital F)
+            sh "docker build -f DockerFile -t ${imageTag} ."
 
             docker.withRegistry('https://index.docker.io/v1/', "dockerhub-creds") {
                 docker.image(imageTag).push()
