@@ -23,7 +23,7 @@ pipeline {
             }
         }
 
-        stage('Install & Build React') {
+    stage('Install & Build React') {
     agent {
         docker {
             image 'node:20-slim'
@@ -31,17 +31,19 @@ pipeline {
         }
     }
     steps {
-       
+
         git branch: 'main', 
             credentialsId: 'github-creds', 
             url: 'https://github.com/ShashmithaBan/Portfolio_2026.git'
 
+        
         sh 'npm ci --prefer-offline'
         sh 'NODE_OPTIONS="--max-old-space-size=512" npm run build'
         
-       
-        sh 'ls -l Dockerfile' 
         
+        sh 'ls -l dist/ && ls -l Dockerfile' 
+        
+     
         stash name: 'build-output', includes: 'dist/**, Dockerfile'
     }
 }
