@@ -115,20 +115,27 @@ stage('Docker Build & Push') {
         }
     }
 }
-    }
-   post {
-        always {
-          node('built-in') {
-            script {
-                // Remove local images to save disk space
-                sh "docker rmi ${DOCKER_IMAGE}:${BUILD_NUMBER} || true"
-                sh "docker rmi ${DOCKER_IMAGE}:latest || true"
-                
-                // Fully wipe the workspace to prevent stash conflicts
-                cleanWs()
+    
+     stage('Update Deployment File') {
+        environment {
+            GIT_REPO_NAME = "react-k8s-gitops-pipeline"
+            GIT_USER_NAME = "ShashmithaBan"
+        }
+        steps {
+            withCredentials([string(credentialsId: 'github-creds', variable: 'GITHUB_TOKEN')]) {
+                sh '''
+                    git config user.email "gimansabandara2001@gmail.com"
+                    git config user.name "Shashmitha Bandara"
+                    BUILD_NUMBER=${BUILD_NUMBER}
+                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" Manifests/Deployment.yml
+                    git add Manifests/Deployment.yml
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
             }
-          }
         }
     }
-
+  
+    
+}
 }

@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: portfolio
-        image: shashmitha2001/portfolio-deploy-react:latest
+        image: shashmitha2001/portfolio-deploy-react:replaceImageTag
         ports:
         - containerPort: 80
