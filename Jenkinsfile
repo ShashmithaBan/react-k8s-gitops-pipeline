@@ -37,8 +37,17 @@ pipeline {
             userRemoteConfigs: [[url: 'https://github.com/ShashmithaBan/Portfolio_2026.git', credentialsId: 'github-creds']]
         ])
 
+        // Clean npm cache to free memory
+        sh 'npm cache clean --force'
+        
         sh 'npm ci --prefer-offline'
-        sh 'NODE_OPTIONS="--max-old-space-size=512" npm run build'
+        
+        // Increased memory + disable source maps for faster builds
+        sh '''
+            export NODE_OPTIONS="--max-old-space-size=1536"
+            export GENERATE_SOURCEMAP=false
+            npm run build
+        '''
         
         script {
             // This will show us EVERY file in the workspace to debug
