@@ -116,26 +116,37 @@ stage('Docker Build & Push') {
     }
 }
     
-     stage('Update Deployment File') {
-        environment {
-            GIT_REPO_NAME = "react-k8s-gitops-pipeline"
-            GIT_USER_NAME = "ShashmithaBan"
-        }
-        steps {
-            withCredentials([string(credentialsId: 'github-creds', variable: 'GITHUB_TOKEN')]) {
-                sh '''
-                    git config user.email "gimansabandara2001@gmail.com"
-                    git config user.name "Shashmitha Bandara"
-                    BUILD_NUMBER=${BUILD_NUMBER}
-                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" Manifests/Deployment.yml
-                    git add Manifests/Deployment.yml
+    stage('Update Deployment File') {
+    agent any 
+    environment {
+        GIT_REPO_NAME = "react-k8s-gitops-pipeline"
+        GIT_USER_NAME = "ShashmithaBan"
+    }
+    steps {
+        // Use usernamePassword if that's how you stored your GitHub PAT
+        withCredentials([usernamePassword(credentialsId: 'github-creds', 
+                         usernameVariable: 'GIT_USER', 
+                         passwordVariable: 'GIT_PASSWORD')]) {
+            sh '''
+                # Set local git config for this specific run
+                git config user.email "gimansabandara2001@gmail.com"
+                git config user.name "Shashmitha Bandara"
+                
+                # Faster sed execution
+                sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" Manifests/Deployment.yml
+                
+                git add Manifests/Deployment.yml
+                
+                # Skip the commit if nothing changed to save time
+                if git diff-index --quiet HEAD; then
+                    echo "No changes to commit"
+                else
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                '''
-            }
+                    # Use the PasswordVariable (Token) for the push
+                    git push https://${GIT_USER}:${GIT_PASSWORD}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
+                fi
+            '''
         }
     }
-  
-    
 }
 }
